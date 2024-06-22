@@ -1,5 +1,5 @@
 # Step 1: Build the JAR file
-FROM gradle:7.3.3-jdk17 AS build
+FROM gradle:7.6-jdk17 AS build
 
 # Set the working directory
 WORKDIR /home/gradle/project
