@@ -1,14 +1,45 @@
 pipeline {
     agent any
-  
+
+    environment {
+        DOCKER_REGISTRY_URL = "${params.harbor_url}"
+        HARBOR_CREDENTAIL = "${params.harbor_credential}"
+        GIT_USER_EMAIL = "${params.git_user_email}"
+        GIT_CREDENTIAL = "${params.github_credential}"
+    }
+
     stages {
-        stage('Build Image') {
+        stage('Build Image for donggu-1') {
             steps {
                 script {
-                    // Docker 빌드 및 태그
-                    docker.withRegistry('http://192.168.20.110:8081', 'harbbor_robot') {
-                        def customImage = docker.build("192.168.20.110:8081/donggu-private-project-1/back-springtomcat:${env.BUILD_NUMBER}")
+                    docker.withRegistry("http://${DOCKER_REGISTRY_URL}", "${HARBOR_CREDENTAIL}") {
+                        def customImage = docker.build("donggu-private-project-1/backend:${env.BUILD_NUMBER}", "-f Dockerfile .")
                         customImage.push()
+                    }
+                }
+            }
+        }
+
+        stage('Update Manifests for donggu-1') {
+            steps {
+                script { 
+                    // Git repository information for manifests
+                    def manifestsRepoUrl = 'https://github.com/Donggu-private-project-1/deploy-argocd.git'
+                    def manifestsRepoBranch = 'main'
+                    
+                    // Checkout manifests repository
+                    git credentialsId: "${HARBOR_CREDENTAIL}", url: manifestsRepoUrl, branch: manifestsRepoBranch
+                    sh """
+                        git pull origin main
+                        sed -i 's|harbor.dorong9.com/donggu-private-project-1/backend:.*|harbor.dorong9.com/donggu-private-project-1/backend:${env.BUILD_NUMBER}|' donggu-1/was/donggu-1-tomcat.yaml
+                        git add donggu-1/was/donggu-1-tomcat.yaml
+                        git config user.name 'DOLONG9'
+                        git config user.email "${GIT_USER_EMAIL}"
+                        git commit -m 'donggu-1/was/donggu-1-tomcat.yaml ${currentBuild.number} image versioning'
+                    """
+                    withCredentials([gitUsernamePassword(credentialsId: "${GIT_CREDENTIAL}")]) {
+                       sh "git remote set-url origin https://github.com/Donggu-private-project-1/deploy-argocd.git" 
+                       sh "git push origin main"
                     }
                 }
             }
