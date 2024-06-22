@@ -8,10 +8,10 @@ WORKDIR /home/gradle/project
 COPY --chown=gradle:gradle demo .
 
 # Build the project
-RUN gradle bootJar
+RUN gradle bootJar --no-daemon
 
-# Step 2: Create the final image
-FROM openjdk:17-jdk-slim
+# Step 2: Create the final image using IBM Semeru JDK 17
+FROM icr.io/appcafe/ibm-semeru-runtimes:open-17-jdk
 
 # Copy the built JAR file from the build image
 COPY --from=build /home/gradle/project/build/libs/*.jar /app.jar
