@@ -7,6 +7,8 @@ WORKDIR /home/app/demo
 # Copy the project files to the container
 COPY demo .
 
+RUN chmod +x gradlew
+
 # Build the project
 RUN ./gradlew bootJar --no-daemon
 
