@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("http://${DOCKER_REGISTRY_URL}", "${HARBOR_CREDENTAIL}") {
-                        def customImage = docker.build("donggu-private-project-1/backend:${env.BUILD_NUMBER}", "-f Dockerfile .")
+                        def customImage = docker.build("donggu-private-project-1/back-springtomcat:${env.BUILD_NUMBER}", "-f Dockerfile .")
                         customImage.push()
                     }
                 }
@@ -31,7 +31,7 @@ pipeline {
                     git credentialsId: "${HARBOR_CREDENTAIL}", url: manifestsRepoUrl, branch: manifestsRepoBranch
                     sh """
                         git pull origin main
-                        sed -i 's|harbor.dorong9.com/donggu-private-project-1/backend:.*|harbor.dorong9.com/donggu-private-project-1/backend:${env.BUILD_NUMBER}|' donggu-1/was/donggu-1-tomcat.yaml
+                        sed -i 's|harbor.dorong9.com/donggu-private-project-1/back-springtomcat:.*|harbor.dorong9.com/donggu-private-project-1/back-springtomcat:${env.BUILD_NUMBER}|' donggu-1/was/donggu-1-tomcat.yaml
                         git add donggu-1/was/donggu-1-tomcat.yaml
                         git config user.name 'DOLONG9'
                         git config user.email "${GIT_USER_EMAIL}"
