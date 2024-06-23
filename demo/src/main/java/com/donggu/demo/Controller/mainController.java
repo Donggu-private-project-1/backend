@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class mainController {
 
-    @CrossOrigin(origins = {"http://donggu-1-nginx/"})
+    @CrossOrigin(origins = "*")
     @GetMapping("/")
     public String test() {
         return "{ name:동구 }";
