@@ -28,7 +28,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("http://${DOCKER_REGISTRY_URL}", "${HARBOR_CREDENTAIL}") {
-                        def customImage = docker.build("donggu-private-project-1/back-springtomcat:${env.BUILD_NUMBER}", "-f .0CICD/Dockerfile .")
+                        def customImage = docker.build("donggu-private-project-1/back-springtomcat:${env.BUILD_NUMBER}", "-f ./.0CICD/Dockerfile .")
                         customImage.push()
                     }
                 }
