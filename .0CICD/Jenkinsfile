@@ -14,24 +14,24 @@ pipeline {
     }
 
     stages {
-    //    stage('Build') {
-    //        steps {
-    //            // Gradle 래퍼에 실행 권한 부여
-    //            sh 'chmod +x ./gradlew'
-    //                            
-    //            // Gradle 빌드 실행
-    //            sh './gradlew clean bootJar'
-    //
-    //            // JAR 파일 복사
-    //            sh 'cp build/libs/*.jar .'
-    //        }
-    //    }
+        stage('Build') {
+            steps {
+                // Gradle 래퍼에 실행 권한 부여
+                sh 'chmod +x ./gradlew'
+                                
+                // Gradle 빌드 실행
+                sh './gradlew bootJar --no-daemon'
+    
+                // JAR 파일 복사
+                sh 'cp build/libs/*.jar .'
+            }
+        }
 
         stage('Build Image for donggu-1') {
             steps {
                 script {
                     docker.withRegistry("http://${DOCKER_REGISTRY_URL}", "${HARBOR_CREDENTAIL}") {
-                        def customImage = docker.build("donggu-private-project-1/back-springtomcat:${env.BUILD_NUMBER}", "-f Dockerfile_first .")
+                        def customImage = docker.build("donggu-private-project-1/back-springtomcat:${env.BUILD_NUMBER}", "-f .0CICD/Dockerfile .")
                         customImage.push()
                     }
                 }
